@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Buddy - AI Study Guide Generator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            position: fixed;
+            bottom: 16px;
+            left: 16px;
+            z-index: 50;
+        }
+
+        .toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            padding: 18px 22px;
+            border-radius: 14px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            font-weight: 700;
+            color: #4a5568;
+            font-size: 1.2rem;
+        }
+
+        .toggle-btn i {
+            color: #667eea;
+            font-size: 1.35rem;
+        }
+
+        /* First-visit hint bubble */
+        .first-visit-hint {
+            position: fixed;
+            bottom: 96px;
+            left: 16px;
+            background: #1a202c;
+            color: #fff;
+            padding: 16px 18px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            z-index: 60;
+            max-width: 280px;
+            font-size: 1.05rem;
+            line-height: 1.5rem;
+            animation: floatY 1.2s ease-in-out infinite alternate;
+        }
+
+        .first-visit-hint:after {
+            content: "";
+            position: absolute;
+            left: 18px;
+            bottom: -12px;
+            width: 0; height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-top: 12px solid #1a202c;
+        }
+
+        @keyframes floatY { from { transform: translateY(0); } to { transform: translateY(-4px); } }
+
+        .sidebar {
+            width: 420px;
+            max-width: 92vw;
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            padding: 24px;
+            border-top-right-radius: 16px;
+            border-bottom-right-radius: 16px;
+            transform: translateX(0);
+            transition: transform 0.3s ease;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-105%);
+        }
+
+        .content {
+            flex: 1;
+            margin-left: 420px;
+            transition: margin-left 0.3s ease;
+            padding: 32px 20px 40px 20px;
+            width: 100%;
+        }
+
+        .content.expanded {
+            margin-left: 0;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .main-content { }
+
+        .form-section {
+            background: transparent;
+            border-radius: 20px;
+            padding: 10px;
+        }
+
+        .form-section h2 {
+            color: #4a5568;
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2d3748;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload input[type=file] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .file-upload-label:hover {
+            border-color: #667eea;
+            background: #edf2f7;
+        }
+
+        .file-upload-label i {
+            font-size: 1.5rem;
+            color: #667eea;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .checkbox-group input[type=checkbox] {
+            width: auto;
+            margin: 0;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            max-width: 1000px;
+            margin: 0 auto;
+            min-height: calc(100vh - 120px);
+        }
+
+        .results-title {
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .results-section h2 {
+            color: #4a5568;
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #e53e3e;
+        }
+
+        .study-guide {
+            display: none;
+        }
+
+        .study-guide.show {
+            display: block;
+        }
+
+        .topic-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .topic-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+
+        .key-concepts {
+            margin-bottom: 20px;
+        }
+
+        .key-concepts h4 {
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .concept-list {
+            list-style: none;
+        }
+
+        .concept-list li {
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+            color: #2d3748;
+        }
+
+        .concept-list li:before {
+            content: "•";
+            color: #667eea;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .terms-section {
+            margin-bottom: 20px;
+        }
+
+        .terms-section h4 {
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .term-item {
+            background: white;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+
+        .term-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .term-definition {
+            color: #4a5568;
+            margin-top: 4px;
+        }
+
+        .questions-section {
+            margin-bottom: 30px;
+        }
+
+        .questions-section h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .question-item {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .question-text {
+            font-weight: 500;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .question-type {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+        }
+
+        .question-options {
+            list-style: none;
+            margin: 10px 0;
+        }
+
+        .question-options li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .question-options li:before {
+            content: "○";
+            color: #667eea;
+            position: absolute;
+            left: 0;
+        }
+
+        .correct-answer {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 3px solid #38a169;
+        }
+
+        .explanation {
+            background: #edf2f7;
+            color: #2d3748;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .practice-exam {
+            background: #fef5e7;
+            border: 2px solid #f6ad55;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .practice-exam h3 {
+            color: #c05621;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .file-info {
+            background: #e6fffa;
+            color: #234e52;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .content { margin-left: 0; padding-top: 72px; }
+            .header h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <button id="openSidebar" class="toggle-btn" aria-label="Toggle sidebar" title="New Study Guide">
+            <i class="fas fa-sliders-h"></i>
+        </button>
+    </div>
+    <div id="firstVisitHint" class="first-visit-hint" style="display:none;">
+        Try the generator – click this button to open the sidebar.
+    </div>
+    <div class="container">
+        <aside id="sidebar" class="sidebar hidden">
+            <div class="form-section">
+                <h2><i class="fas fa-edit"></i> Course Content</h2>
+                <form id="studyGuideForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="subject">Class Subject *</label>
+                        <input type="text" id="subject" name="subject" required placeholder="e.g., Physics, Mathematics, Biology">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="topic">Current Topic *</label>
+                        <input type="text" id="topic" name="topic" required placeholder="e.g., Projectile Motion, Calculus, Cell Biology">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Upload Study Materials (Optional)</label>
+                        <div class="file-upload">
+                            <input type="file" id="files" name="files" multiple accept=".pdf,.docx,.pptx,.txt">
+                            <label for="files" class="file-upload-label">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <div>
+                                    <div>Click to upload files</div>
+                                    <small>PDF, DOCX, PPTX, TXT (Max 16MB each)</small>
+                                </div>
+                            </label>
+                        </div>
+                        <div id="fileInfo" class="file-info" style="display: none;"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="includePracticeExam" name="include_practice_exam" value="true">
+                            <label for="includePracticeExam">Include Practice Exam Questions</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        <i class="fas fa-magic"></i>
+                        Generate Study Guide
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <main id="content" class="content expanded">
+            <div class="header">
+                <h1><i class="fas fa-graduation-cap"></i> Study Buddy</h1>
+                <p>AI-Powered Study Guide Generator</p>
+            </div>
+
+            <div class="results-section">
+                <h2 class="results-title"><i class="fas fa-book-open"></i> Study Guide Results</h2>
+                <div id="loading" class="loading" style="display: none;">
+                    <i class="fas fa-spinner"></i>
+                    <p>Generating your study guide...</p>
+                </div>
+                <div id="error" class="error" style="display: none;"></div>
+                <div id="studyGuide" class="study-guide"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('studyGuideForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const studyGuide = document.getElementById('studyGuide');
+            const fileInput = document.getElementById('files');
+            const fileInfo = document.getElementById('fileInfo');
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('content');
+            const openSidebarBtn = document.getElementById('openSidebar');
+            const firstVisitHint = document.getElementById('firstVisitHint');
+
+            function hideSidebar() {
+                sidebar.classList.add('hidden');
+                content.classList.add('expanded');
+            }
+
+            function showSidebar() {
+                sidebar.classList.remove('hidden');
+                content.classList.remove('expanded');
+                // Dismiss and persist dismissal of the first-visit hint
+                if (firstVisitHint.style.display !== 'none') {
+                    firstVisitHint.style.display = 'none';
+                    try { localStorage.setItem('sb_first_visit_done', 'true'); } catch (e) {}
+                }
+            }
+
+            openSidebarBtn.addEventListener('click', function() {
+                if (sidebar.classList.contains('hidden')) {
+                    showSidebar();
+                } else {
+                    hideSidebar();
+                }
+            });
+
+            // Show first-visit hint only once
+            try {
+                const visited = localStorage.getItem('sb_first_visit_done') === 'true';
+                if (!visited) {
+                    firstVisitHint.style.display = 'block';
+                }
+            } catch (e) {
+                // If localStorage not available, still show hint
+                firstVisitHint.style.display = 'block';
+            }
+
+            // File input handling
+            fileInput.addEventListener('change', function() {
+                const files = this.files;
+                if (files.length > 0) {
+                    let fileNames = Array.from(files).map(file => file.name).join(', ');
+                    fileInfo.textContent = `Selected: ${fileNames}`;
+                    fileInfo.style.display = 'block';
+                } else {
+                    fileInfo.style.display = 'none';
+                }
+            });
+
+            // Form submission
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Show loading state
+                loading.style.display = 'block';
+                error.style.display = 'none';
+                studyGuide.style.display = 'none';
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+
+                try {
+                    const formData = new FormData();
+                    formData.append('subject', document.getElementById('subject').value);
+                    formData.append('topic', document.getElementById('topic').value);
+                    formData.append('include_practice_exam', document.getElementById('includePracticeExam').checked);
+
+                    // Add files if any
+                    const files = fileInput.files;
+                    for (let i = 0; i < files.length; i++) {
+                        formData.append('files', files[i]);
+                    }
+
+                    const response = await fetch('/generate-study-guide', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        displayStudyGuide(result.study_guide);
+                        // Collapse the sidebar to focus results
+                        hideSidebar();
+                    } else {
+                        showError(result.error || 'An error occurred while generating the study guide.');
+                    }
+                } catch (err) {
+                    showError('Network error. Please check if the server is running.');
+                } finally {
+                    loading.style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-magic"></i> Generate Study Guide';
+                }
+            });
+
+            function showError(message) {
+                error.textContent = message;
+                error.style.display = 'block';
+            }
+
+            function displayStudyGuide(studyGuideData) {
+                try {
+                    const data = JSON.parse(studyGuideData);
+                    
+                    let html = `
+                        <div class="study-guide-header">
+                            <h3>${data.class_subject} - ${data.current_topic}</h3>
+                        </div>
+                    `;
+
+                    // Display topics
+                    if (data.topics && data.topics.length > 0) {
+                        data.topics.forEach(topic => {
+                            html += `
+                                <div class="topic-section">
+                                    <div class="topic-title">${topic.title}</div>
+                                    
+                                    <div class="key-concepts">
+                                        <h4><i class="fas fa-lightbulb"></i> Key Concepts</h4>
+                                        <ul class="concept-list">
+                                            ${topic.key_concepts.map(concept => `<li>${concept}</li>`).join('')}
+                                        </ul>
+                                    </div>
+
+                                    <div class="terms-section">
+                                        <h4><i class="fas fa-bookmark"></i> Important Terms</h4>
+                                        ${topic.important_terms.map(term => `
+                                            <div class="term-item">
+                                                <div class="term-name">${term.term}</div>
+                                                <div class="term-definition">${term.definition}</div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+
+                                    <div class="summary">
+                                        <h4><i class="fas fa-clipboard-list"></i> Summary</h4>
+                                        <p>${topic.summary}</p>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    // Display example questions
+                    if (data.example_questions && data.example_questions.questions) {
+                        html += `
+                            <div class="questions-section">
+                                <h3><i class="fas fa-question-circle"></i> Example Questions</h3>
+                                ${data.example_questions.questions.map(question => `
+                                    <div class="question-item">
+                                        <div class="question-type">${question.question_type}</div>
+                                        <div class="question-text">${question.question_text}</div>
+                                        ${question.options && question.options.length > 0 ? `
+                                            <ul class="question-options">
+                                                ${question.options.map(option => `<li>${option}</li>`).join('')}
+                                            </ul>
+                                        ` : ''}
+                                        <div class="correct-answer">
+                                            <strong>Answer:</strong> ${question.correct_answer}
+                                        </div>
+                                        <div class="explanation">
+                                            <strong>Explanation:</strong> ${question.explanation}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+
+                    // Display practice exam
+                    if (data.practice_exam && data.practice_exam.included && data.practice_exam.questions) {
+                        html += `
+                            <div class="practice-exam">
+                                <h3><i class="fas fa-trophy"></i> Practice Exam</h3>
+                                ${data.practice_exam.questions.map(question => `
+                                    <div class="question-item">
+                                        <div class="question-type">${question.question_type}</div>
+                                        <div class="question-text">${question.question_text}</div>
+                                        ${question.options && question.options.length > 0 ? `
+                                            <ul class="question-options">
+                                                ${question.options.map(option => `<li>${option}</li>`).join('')}
+                                            </ul>
+                                        ` : ''}
+                                        <div class="correct-answer">
+                                            <strong>Answer:</strong> ${question.correct_answer}
+                                        </div>
+                                        <div class="explanation">
+                                            <strong>Explanation:</strong> ${question.explanation}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+
+                    studyGuide.innerHTML = html;
+                    studyGuide.classList.add('show');
+                    studyGuide.style.display = 'block';
+
+                } catch (err) {
+                    showError('Error parsing study guide data.');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

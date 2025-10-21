@@ -1,25 +1,35 @@
-# Study Buddy API
+# Study Buddy AI Assistant
 
-A Flask-based API that generates comprehensive study guides using OpenAI's GPT model. The API can process uploaded files (PDF, DOCX, PPTX, TXT) and create personalized study materials.
+A Flask-based web application that generates comprehensive study guides using OpenAI's GPT model. The application can process uploaded files (PDF, DOCX, PPTX, TXT) and create personalized study materials with an intuitive web interface.
 
 ## Features
 
+- **Modern Web Interface**: Clean, responsive design with drag-and-drop file upload
 - **File Upload Support**: Upload PDF, DOCX, PPTX, and TXT files
 - **Template-based Generation**: Uses a structured prompt template for consistent output
 - **Study Guide Generation**: Creates comprehensive study materials with:
   - Key concepts and important terms
-  - Example questions
+  - Example questions with detailed explanations
   - Practice exams (optional)
 - **JSON Output**: Returns structured JSON data
+- **Environment Variable Support**: Secure API key management
 
-## Installation
+## Quick Start
 
-1. Create a virtual environment:
+### 1. Clone the Repository
+```bash
+git clone https://github.com/yao-ming-svg/study-buddy-ai.git
+cd study-buddy-ai
+```
+
+### 2. Set Up Environment
+
+Create a virtual environment:
 ```bash
 python -m venv venv
 ```
 
-2. Activate the virtual environment:
+Activate the virtual environment:
 ```bash
 # Windows
 .\venv\Scripts\Activate.ps1
@@ -28,10 +38,33 @@ python -m venv venv
 source venv/bin/activate
 ```
 
-3. Install dependencies:
+### 3. Install Dependencies
 ```bash
-pip install flask openai python-docx PyPDF2 python-pptx requests
+pip install -r requirements.txt
 ```
+
+### 4. Configure Environment Variables
+
+Copy the example environment file:
+```bash
+# Windows
+copy .env.example .env
+
+# Linux/Mac
+cp .env.example .env
+```
+
+Edit the `.env` file and add your OpenAI API key:
+```env
+OPENAI_API_KEY=your_openai_api_key_here
+```
+
+### 5. Run the Application
+```bash
+python study_buddy_server.py
+```
+
+The application will be available at `http://localhost:5000`
 
 ## Usage
 
@@ -142,11 +175,30 @@ The API can extract text from the following file types:
 
 ## Configuration
 
-Make sure to update the OpenAI API key in `study_buddy_server.py`:
+The application uses environment variables for secure configuration. The API key is loaded from the `.env` file:
 
 ```python
-client = OpenAI(api_key="your-api-key-here")
+# In study_buddy_server.py
+from dotenv import load_dotenv
+load_dotenv()
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 ```
+
+### Environment Variables
+
+Create a `.env` file in the project root with the following variables:
+
+```env
+# Required
+OPENAI_API_KEY=your_openai_api_key_here
+
+# Optional
+FLASK_ENV=development
+FLASK_DEBUG=True
+```
+
+**Important**: Never commit your `.env` file to version control. The `.gitignore` file is already configured to exclude it.
 
 ## Testing
 
@@ -160,11 +212,40 @@ python test_api.py
 
 ```
 ├── study_buddy_server.py    # Main Flask application
+├── templates/
+│   └── index.html          # Web interface template
 ├── video_prompt_template.txt # Prompt template for study guide generation
-├── test_api.py              # Test script
-├── open_ai_api_test.py      # Original test script
+├── open_ai_api_test.py      # API test script
+├── sample_output.json       # Example output format
+├── requirements.txt         # Python dependencies
+├── .env.example            # Environment variables template
+├── .gitignore              # Git ignore rules
 └── README.md               # This file
 ```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **ModuleNotFoundError**: Make sure you've activated your virtual environment and installed dependencies:
+   ```bash
+   .\venv\Scripts\Activate.ps1  # Windows
+   pip install -r requirements.txt
+   ```
+
+2. **API Key Error**: Ensure your `.env` file exists and contains a valid OpenAI API key:
+   ```bash
+   # Check if .env file exists
+   ls .env  # Linux/Mac
+   dir .env  # Windows
+   ```
+
+3. **Unicode Encoding Issues**: The application handles Unicode characters properly. If you encounter encoding issues, ensure your terminal supports UTF-8.
+
+4. **Port Already in Use**: If port 5000 is busy, you can change it in `study_buddy_server.py`:
+   ```python
+   app.run(host='0.0.0.0', port=5001, debug=True)  # Change port to 5001
+   ```
 
 ## Notes
 
@@ -172,3 +253,5 @@ python test_api.py
 - Maximum file upload size is 16MB
 - All file processing is done in memory with temporary files
 - The API uses OpenAI's GPT-5-mini model for generation
+- Environment variables are loaded automatically from `.env` file
+- The application includes comprehensive error handling and logging

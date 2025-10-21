@@ -8,6 +8,10 @@ from openai import OpenAI
 import PyPDF2
 from docx import Document
 from pptx import Presentation
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Set console encoding to UTF-8
 if sys.platform == "win32":

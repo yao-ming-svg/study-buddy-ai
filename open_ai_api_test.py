@@ -1,6 +1,10 @@
 import sys
 import os
 from openai import OpenAI
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Set console encoding to UTF-8
 if sys.platform == "win32":

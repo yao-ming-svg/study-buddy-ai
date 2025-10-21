@@ -1,0 +1,194 @@
+{
+  "class_subject": "Physics",
+  "current_topic": "Projectile Motion",
+  "topics": [
+    {
+      "title": "Introduction to Projectile Motion",
+      "key_concepts": [
+        "Projectile motion combines constant horizontal velocity with uniformly accelerated vertical motion (gravity).",
+        "Horizontal and vertical motions are independent (neglecting air resistance).",
+        "Trajectory of a projectile (under constant g) is a parabola."
+      ],
+      "important_terms": [
+        {
+          "term": "Projectile",
+          "definition": "An object in free flight affected only by gravity (neglecting air resistance)."
+        },
+        {
+          "term": "Trajectory",
+          "definition": "The curved path traced by a projectile through space."
+        },
+        {
+          "term": "Launch Angle (θ)",
+          "definition": "Angle between the initial velocity vector and the horizontal."
+        }
+      ],
+      "summary": "Projectile motion is modeled by separating motion into horizontal (constant velocity) and vertical (constant acceleration g) components. Combining solutions yields a parabolic trajectory described by kinematic equations."
+    },
+    {
+      "title": "Kinematic Equations and Component Analysis",
+      "key_concepts": [
+        "Resolve initial velocity v0 into v0x = v0 cosθ and v0y = v0 sinθ.",
+        "Horizontal motion: x = v0x t (no horizontal acceleration).",
+        "Vertical motion: y = v0y t - (1/2) g t^2 and vy = v0y - g t."
+      ],
+      "important_terms": [
+        {
+          "term": "v0x, v0y",
+          "definition": "Components of the initial velocity in horizontal and vertical directions."
+        },
+        {
+          "term": "Time of Flight",
+          "definition": "Total time the projectile remains in motion before returning to the reference vertical level."
+        },
+        {
+          "term": "Maximum Height",
+          "definition": "The highest vertical position reached, where vertical velocity equals zero."
+        }
+      ],
+      "summary": "Use vector decomposition to apply 1D kinematic formulas independently to horizontal and vertical axes. Solve for time, position, and velocities using v0x, v0y, and g."
+    },
+    {
+      "title": "Range, Maximum Height, and Optimization",
+      "key_concepts": [
+        "Range R (level ground) = (v0^2 sin(2θ)) / g.",
+        "Maximum range for given speed occurs at θ = 45° (neglecting air resistance).",
+        "Max height H = (v0y^2) / (2g) = (v0^2 sin^2 θ) / (2g)."
+      ],
+      "important_terms": [
+        {
+          "term": "Range (R)",
+          "definition": "Horizontal distance traveled by a projectile between launch and landing at same vertical level."
+        },
+        {
+          "term": "Optimal Angle",
+          "definition": "The launch angle that maximizes range for a given speed, typically 45° without air resistance."
+        },
+        {
+          "term": "Symmetry",
+          "definition": "For level launches, the ascent and descent times are equal; speed at equal heights are equal in magnitude."
+        }
+      ],
+      "summary": "Key derived formulas: R = (v0^2 sin(2θ))/g, H = (v0^2 sin^2 θ)/(2g). Use these to optimize launch parameters and compute peak and distance properties."
+    },
+    {
+      "title": "Extensions: Angled Launches, Heights, and Limitations",
+      "key_concepts": [
+        "For launch from height h, time of flight solves quadratic y(t) = h + v0y t - 0.5 g t^2 = 0 for t>0.",
+        "Inclined-plane and moving-observer problems require coordinate rotation or relative velocity.",
+        "Air resistance invalidates simple independence and typically reduces range and alters symmetry."
+      ],
+      "important_terms": [
+        {
+          "term": "Launch from Height",
+          "definition": "Projectile released from nonzero initial height; landing time found by solving vertical position equation for t."
+        },
+        {
+          "term": "Relative Motion",
+          "definition": "Analysis of projectile trajectories observed from moving frames; velocities add vectorially."
+        },
+        {
+          "term": "Air Resistance",
+          "definition": "A force opposing motion; makes equations nonlinear and often requires numerical methods."
+        }
+      ],
+      "summary": "Realistic problems may include nonzero launch heights, inclined targets, moving observers, or drag. These require modified equations or numerical solutions; basic projectile results apply when drag is negligible."
+    }
+  ],
+  "example_questions": {
+    "questions": [
+      {
+        "question_text": "At what angle above horizontal is the range of a projectile maximized (neglecting air resistance)?",
+        "question_type": "multiple_choice",
+        "options": [
+          "30 degrees",
+          "45 degrees",
+          "60 degrees",
+          "90 degrees"
+        ],
+        "correct_answer": "45 degrees",
+        "explanation": "Range R = (v0^2 sin(2θ))/g is maximized when sin(2θ)=1, so 2θ = 90°, θ = 45°."
+      },
+      {
+        "question_text": "Explain why horizontal motion and vertical motion are treated independently in projectile problems (neglecting air resistance).",
+        "question_type": "conceptual",
+        "options": [],
+        "correct_answer": "Because gravity acts vertically only, so horizontal acceleration is zero and vertical acceleration is g; thus motions obey independent kinematic equations.",
+        "explanation": "Newton's second law gives no horizontal force (zero acceleration) while vertical acceleration is constant g, allowing separate 1D analyses."
+      },
+      {
+        "question_text": "A projectile is launched with speed 20 m/s at 30 degrees. What are the horizontal and vertical components of the initial velocity?",
+        "question_type": "short_answer",
+        "options": [],
+        "correct_answer": "v0x = 20 cos30° = 17.32 m/s; v0y = 20 sin30° = 10.00 m/s",
+        "explanation": "Compute v0x = v0 cosθ and v0y = v0 sinθ. cos30°≈0.866, sin30°=0.5."
+      }
+    ]
+  },
+  "practice_exam": {
+    "included": true,
+    "questions": [
+      {
+        "question_text": "A projectile is launched from ground level with speed 25 m/s at 40°. Calculate the time of flight (use g = 9.8 m/s^2).",
+        "question_type": "calculation",
+        "options": [],
+        "correct_answer": "3.21 s",
+        "explanation": "Time of flight = 2 v0 sinθ / g = 2(25)(sin40°)/9.8 ≈ 3.21 s."
+      },
+      {
+        "question_text": "Using the same projectile (25 m/s at 40°), find the maximum height reached.",
+        "question_type": "calculation",
+        "options": [],
+        "correct_answer": "8.22 m",
+        "explanation": "H = (v0^2 sin^2 θ)/(2g) = (25^2 * sin^2 40°)/(2*9.8) ≈ 8.22 m."
+      },
+      {
+        "question_text": "Find the horizontal range for the projectile launched at 25 m/s and 40° (g = 9.8 m/s^2).",
+        "question_type": "calculation",
+        "options": [],
+        "correct_answer": "80.1 m",
+        "explanation": "Range R = (v0^2 sin(2θ))/g = (25^2 * sin80°)/9.8 ≈ 80.1 m."
+      },
+      {
+        "question_text": "A projectile is launched horizontally from a cliff 45 m high with initial horizontal speed 15 m/s. How far from the cliff base does it land?",
+        "question_type": "calculation",
+        "options": [],
+        "correct_answer": "45.9 m",
+        "explanation": "Time to fall t = sqrt(2h/g) = sqrt(90/9.8)=3.03 s. Horizontal distance = v0x * t = 15*3.03 ≈ 45.9 m."
+      },
+      {
+        "question_text": "Which factor causes the symmetry between ascent and descent to break for a projectile?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Neglecting gravity",
+          "Presence of air resistance",
+          "Launching at 45 degrees",
+          "Using different units"
+        ],
+        "correct_answer": "Presence of air resistance",
+        "explanation": "Air resistance produces a non-conservative force that changes the speed differently during ascent and descent, breaking symmetry."
+      },
+      {
+        "question_text": "A student claims that doubling the launch speed doubles the range for a fixed angle. Is the claim correct? Explain briefly.",
+        "question_type": "short_answer",
+        "options": [],
+        "correct_answer": "No. Range scales with v0^2, so doubling v0 quadruples the range for the same angle (R ∝ v0^2).",
+        "explanation": "R = (v0^2 sin2θ)/g shows quadratic dependence on v0, not linear."
+      },
+      {
+        "question_text": "A projectile is launched at speed 30 m/s from a height of 10 m at angle 50°. Compute the time to impact (use g = 9.8 m/s^2).",
+        "question_type": "calculation",
+        "options": [],
+        "correct_answer": "Approximately 3.06 s",
+        "explanation": "Solve y(t)=h + v0y t - 0.5 g t^2 = 0 with v0y=30 sin50°≈22.98 m/s:  -4.9 t^2 + 22.98 t +10 =0 → positive root t≈3.06 s."
+      },
+      {
+        "question_text": "Describe briefly how you would analyze a projectile on an inclined plane.",
+        "question_type": "conceptual",
+        "options": [],
+        "correct_answer": "Rotate axes to align one axis parallel to the incline; decompose initial velocity into components along and perpendicular to incline; apply kinematics along incline and solve for intersection.",
+        "explanation": "Using rotated coordinates simplifies the geometry; treat motion along incline with appropriate acceleration components."
+      }
+    ]
+  }
+}
